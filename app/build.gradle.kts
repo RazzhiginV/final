@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
+    implementation("io.coil-kt:coil-compose:2.6.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     implementation(libs.androidx.compose.material.icons.extended)

@@ -1,4 +1,4 @@
-package com.example.lostfoundthings
+package com.example.lostfoundthings.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

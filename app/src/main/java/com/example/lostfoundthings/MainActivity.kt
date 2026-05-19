@@ -18,10 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.lostfoundthings.navigation.NavigationHost
+import com.example.lostfoundthings.navigation.ScreenClass
 import com.example.lostfoundthings.ui.theme.LostFoundThingsTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,7 +42,8 @@ class MainActivity : ComponentActivity() {
                         Box(
                             modifier = Modifier.fillMaxWidth()
                                 .navigationBarsPadding()
-                                .padding(bottom = 16.dp, start = 24.dp, end = 24.dp)
+                                .padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
+                                .shadow(elevation = 5.dp, shape = RoundedCornerShape(20.dp))
                         ) {
                             NavigationBar(
                                 Modifier.clip(shape = RoundedCornerShape(24.dp))
@@ -52,7 +56,11 @@ class MainActivity : ComponentActivity() {
                                     NavigationBarItem(
                                         selected = screen.route == currentRoute,
                                         onClick = {
-                                            navController.navigate(route = screen.route)
+                                            navController.navigate(screen.route) {
+                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
                                         },
                                         icon = {
                                             Icon(
@@ -72,8 +80,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                ) { _ ->
-                    NavigationHost(navController)
+                ) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        NavigationHost(navController)
+                    }
                 }
             }
         }
