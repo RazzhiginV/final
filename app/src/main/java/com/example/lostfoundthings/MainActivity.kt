@@ -35,48 +35,50 @@ class MainActivity : ComponentActivity() {
             LostFoundThingsTheme {
                 val navController = rememberNavController()
                 val screens = listOf(ScreenClass.Posts, ScreenClass.Create, ScreenClass.Chats, ScreenClass.Profile)
+                val hideBottomBar = listOf("register", "login", "detail")
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
 
                 Scaffold(
                     modifier = Modifier.padding(top = 20.dp),
                     bottomBar = {
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                                .navigationBarsPadding()
-                                .padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
-                                .shadow(elevation = 5.dp, shape = RoundedCornerShape(20.dp))
-                        ) {
-                            NavigationBar(
-                                Modifier.clip(shape = RoundedCornerShape(24.dp))
-                                    .height(70.dp)
+                        if (currentRoute !in hideBottomBar) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                                    .navigationBarsPadding()
+                                    .padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
+                                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(20.dp))
                             ) {
-
-                                val backStackEntry by navController.currentBackStackEntryAsState()
-                                val currentRoute = backStackEntry?.destination?.route
-                                screens.forEach { screen ->
-                                    NavigationBarItem(
-                                        selected = screen.route == currentRoute,
-                                        onClick = {
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
+                                NavigationBar(
+                                    Modifier.clip(shape = RoundedCornerShape(24.dp))
+                                        .height(70.dp)
+                                ) {
+                                    screens.forEach { screen ->
+                                        NavigationBarItem(
+                                            selected = screen.route == currentRoute,
+                                            onClick = {
+                                                navController.navigate(screen.route) {
+                                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    screen.icon,
+                                                    contentDescription = screen.contentDescription
+                                                )
+                                            },
+                                            label = {
+                                                Text(
+                                                    text = screen.label,
+                                                    fontSize = 9.sp
+                                                )
                                             }
-                                        },
-                                        icon = {
-                                            Icon(
-                                                screen.icon,
-                                                contentDescription = screen.contentDescription
-                                            )
-                                        },
-                                        label = {
-                                            Text(
-                                                text = screen.label,
-                                                fontSize = 9.sp
-                                            )
-                                        }
-                                    )
-                                }
+                                        )
+                                    }
 
+                                }
                             }
                         }
                     }

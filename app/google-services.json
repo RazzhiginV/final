@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "112702711436",
+    "project_id": "get-back-bacbb",
+    "storage_bucket": "get-back-bacbb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112702711436:android:3e1c1498f8c1352e2efda9",
+        "android_client_info": {
+          "package_name": "com.example.lostfoundthings"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112702711436-j3l9cc84g9e3on12ak0dfoj7004e8h5e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lostfoundthings",
+            "certificate_hash": "c9f32ceb2912d5c2cfaee3a62c737d7ed0c83b6f"
+          }
+        },
+        {
+          "client_id": "112702711436-cuopgbdvn98gt3qgtba0h45fi78957hm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuX0i3dxX5RAkAiY4eMmp9S98MMuZKruw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112702711436-cuopgbdvn98gt3qgtba0h45fi78957hm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

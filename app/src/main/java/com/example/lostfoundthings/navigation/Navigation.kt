@@ -4,18 +4,33 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.lostfoundthings.data.AuthManager
 import com.example.lostfoundthings.screens.ChatsScreen
 import com.example.lostfoundthings.screens.CreateScreen
+import com.example.lostfoundthings.screens.LoginScreen
 import com.example.lostfoundthings.screens.PostsScreen
 import com.example.lostfoundthings.screens.ProfileScreen
+import com.example.lostfoundthings.screens.RegisterScreen
 
 @Composable
 fun NavigationHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = ScreenClass.Posts.route
+        startDestination = if (AuthManager.isUserLoggedIn) "posts" else "login"
     ) {
+
+        composable(
+            route = ScreenClass.Login.route
+        ) {
+            LoginScreen(navController)
+        }
+
+        composable(
+            route = ScreenClass.Register.route
+        ) {
+            RegisterScreen(navController)
+        }
 
         composable(
             route = ScreenClass.Posts.route
@@ -38,7 +53,7 @@ fun NavigationHost(navController: NavHostController) {
         composable(
             route = ScreenClass.Profile.route
         ) {
-            ProfileScreen()
+            ProfileScreen(navController)
         }
 
     }
