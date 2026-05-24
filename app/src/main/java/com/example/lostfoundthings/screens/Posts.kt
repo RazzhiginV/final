@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,13 +49,13 @@ fun PostsScreen(viewModel: PostsViewModel = viewModel()) {
 
     LazyColumn(modifier = Modifier.padding(horizontal = 4.dp)) {
         items(posts) { post ->
-            PostCard(post.id, post.title, post.description, post.photo, post.address, post.lat, post.lon, post.authorName, post.authorPhoto, post.state)
+            PostCard(post.title, post.description, post.photo, post.address, post.lat, post.lon, post.authorName, post.authorPhoto, post.state)
         }
     }
 }
 
 @Composable
-fun PostCard(id: Int, title: String, desc: String, url: String?, address: String, lat: Double, lon: Double, authorName: String, authorPhoto: String?, state: String) {
+fun PostCard(title: String, desc: String, url: String?, address: String, lat: Double, lon: Double, authorName: String, authorPhoto: String?, state: String) {
     OutlinedCard(modifier = Modifier.padding(8.dp)) {
         Column(modifier = Modifier
             .padding(8.dp)
