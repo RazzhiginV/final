@@ -14,10 +14,11 @@ sealed class ScreenClass(
     val contentDescription: String
 ) {
     data object Posts: ScreenClass("posts", "Posts", Icons.Default.Home, "Posts")
-    data object Create: ScreenClass("create", "Create", Icons.Default.Add, "Create")
+    data object MyPosts: ScreenClass("myPosts", "MyPosts", Icons.Default.Add, "MyPosts")
     data object Chats: ScreenClass("chats", "Chats", Icons.AutoMirrored.Filled.Send, "Chats")
     data object Profile: ScreenClass("profile", "Profile", Icons.Default.AccountCircle, "Profile")
     data object Register: ScreenClass("register", "Register", Icons.Default.AccountCircle, "Registration")
     data object Login: ScreenClass("login", "Login", Icons.Default.AccountCircle, "Login")
+    data object Create: ScreenClass("create", "Create", Icons.Default.Add, "Create")
 
 }

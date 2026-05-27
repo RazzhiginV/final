@@ -1,6 +1,7 @@
 package com.example.lostfoundthings.data
 
 import android.content.Context
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.CustomCredential
@@ -125,7 +126,7 @@ object AuthManager {
                 "Неверный формат Email"
             ("user-not-found" in errorMessage || "no user record" in errorMessage) ->
                 "Пользователь с таким Email не найден"
-            ("wrong-password" in errorMessage || "invalid-credential" in errorMessage) ->
+            ("wrong-password" in errorMessage || "credential is incorrect" in errorMessage) ->
                 "Неверный пароль или Email"
             ("email-already-in-use" in errorMessage || "already exists" in errorMessage || "email address is already in use" in errorMessage) ->
                 "Этот Email уже зарегистрирован другим пользователем"
@@ -133,7 +134,7 @@ object AuthManager {
                 "Слишком слабый пароль (нужно минимум 6 символов)"
             "network-request-failed" in errorMessage ->
                 "Проблема с интернетом. Проверьте подключение"
-            "cancelled" in errorMessage ->
+            ("cancelled" in errorMessage || "Cancelled" in errorMessage) ->
                 "Вход через Google отменен"
             else -> "Ошибка сервера"
         }

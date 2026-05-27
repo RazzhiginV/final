@@ -18,11 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,9 +37,6 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -53,8 +46,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         Text("Войти в аккаунт", fontSize = 32.sp, modifier = Modifier.padding(bottom = 32.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
             label = { Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
@@ -64,8 +57,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
             label = { Text("Пароль") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -88,14 +81,14 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
             },
             enabled = !viewModel.isLoading
         ) {
-            if (isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp)) else Text("Войти")
+            if (viewModel.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp)) else Text("Войти")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedButton(
             onClick = {
-                AuthManager.signInWithGoogle(
+                viewModel.loginWithGoogle(
                     context = context,
                     scope = scope,
                     onSuccess = {

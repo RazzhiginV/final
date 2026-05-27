@@ -1,23 +1,28 @@
 package com.example.lostfoundthings.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.lostfoundthings.data.AuthManager
 import com.example.lostfoundthings.screens.ChatsScreen
-import com.example.lostfoundthings.screens.CreateScreen
+import com.example.lostfoundthings.screens.CreatePostScreen
+import com.example.lostfoundthings.screens.MyPostsScreen
 import com.example.lostfoundthings.screens.LoginScreen
 import com.example.lostfoundthings.screens.PostsScreen
 import com.example.lostfoundthings.screens.ProfileScreen
 import com.example.lostfoundthings.screens.RegisterScreen
+import com.example.lostfoundthings.viewmodel.CreatePostViewModel
 
 @Composable
-fun NavigationHost(navController: NavHostController) {
+fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
 
     NavHost(
         navController = navController,
-        startDestination = if (AuthManager.isUserLoggedIn) "posts" else "login"
+        startDestination = if (AuthManager.isUserLoggedIn) "posts" else "login",
+        modifier = Modifier
     ) {
 
         composable(
@@ -41,7 +46,13 @@ fun NavigationHost(navController: NavHostController) {
         composable(
             route = ScreenClass.Create.route
         ) {
-            CreateScreen()
+            CreatePostScreen(navController)
+        }
+
+        composable(
+            route = ScreenClass.MyPosts.route
+        ) {
+            MyPostsScreen(navController)
         }
 
         composable(

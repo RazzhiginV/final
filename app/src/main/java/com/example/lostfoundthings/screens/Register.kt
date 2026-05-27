@@ -32,10 +32,6 @@ import com.example.lostfoundthings.viewmodel.RegisterViewModel
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = viewModel()) {
     val context = LocalContext.current
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Column(
@@ -46,24 +42,24 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
         Text("Регистрация", fontSize = 32.sp, modifier = Modifier.padding(bottom = 32.dp))
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = viewModel.name,
+            onValueChange = { viewModel.name = it },
             label = { Text("Имя") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
             label = { Text("Пароль") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),

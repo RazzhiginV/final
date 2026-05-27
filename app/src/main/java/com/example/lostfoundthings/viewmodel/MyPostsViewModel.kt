@@ -12,26 +12,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PostsViewModel : ViewModel() {
+class MyPostsViewModel : ViewModel() {
+    private val _myPosts = MutableStateFlow<List<Post>>(emptyList())
+    val myPosts: StateFlow<List<Post>> = _myPosts.asStateFlow()
 
-    private val _posts = MutableStateFlow<List<Post>>(emptyList())
-    val posts: StateFlow<List<Post>> = _posts.asStateFlow()
     var isLoading by mutableStateOf(false)
     var errorText by mutableStateOf<String?>(null)
 
     init {
-        loadAllPosts()
+        loadMyPosts()
     }
 
-    private fun loadAllPosts() {
+    fun loadMyPosts() {
         isLoading = true
         errorText = null
-
         viewModelScope.launch {
-            PostRepository.getAllPosts(
+            PostRepository.getMyPosts(
                 onSuccess = { fetchedList ->
                     isLoading = false
-                    _posts.value = fetchedList
+                    _myPosts.value = fetchedList
                 },
                 onError = { message ->
                     isLoading = false

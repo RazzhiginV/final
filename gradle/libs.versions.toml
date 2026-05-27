@@ -13,6 +13,16 @@ navigationCompose = "2.9.7"
 navigationComposeVersion = "2.8.0-alpha02"
 ui = "1.10.4"
 material3 = "1.4.0"
+cameraCore = "1.6.1"
+cameraLifecycle = "1.6.1"
+cameraView = "1.6.1"
+retrofit = "2.9.0"
+okhttp = "4.11.0"
+coilCompose = "2.6.0"
+firebaseBom = "34.13.0"
+googleid = "1.1.1"
+yandexMaps = "4.5.1-lite"
+camera = "1.4.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -34,6 +44,19 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+google-identity-id = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+yandex-maps = { group = "com.yandex.android", name = "maps.mobile", version.ref = "yandexMaps" }
+androidx-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camera" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

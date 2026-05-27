@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -21,11 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lostfoundthings.navigation.NavigationHost
 import com.example.lostfoundthings.navigation.ScreenClass
 import com.example.lostfoundthings.ui.theme.LostFoundThingsTheme
+import com.yandex.mapkit.MapKitFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,19 +37,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             LostFoundThingsTheme {
                 val navController = rememberNavController()
-                val screens = listOf(ScreenClass.Posts, ScreenClass.Create, ScreenClass.Chats, ScreenClass.Profile)
+                val screens = listOf(ScreenClass.Posts, ScreenClass.MyPosts, ScreenClass.Chats, ScreenClass.Profile)
                 val hideBottomBar = listOf("register", "login", "detail")
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val createPostViewModel: com.example.lostfoundthings.viewmodel.CreatePostViewModel = viewModel()
 
                 Scaffold(
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.fillMaxSize().padding(vertical = 20.dp),
                     bottomBar = {
-                        if (currentRoute !in hideBottomBar) {
+                        if (currentRoute !in hideBottomBar && !createPostViewModel.cameraUsing) {
                             Box(
                                 modifier = Modifier.fillMaxWidth()
                                     .navigationBarsPadding()
-                                    .padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
+                                    .padding(start = 24.dp, end = 24.dp)
                                     .shadow(elevation = 5.dp, shape = RoundedCornerShape(20.dp))
                             ) {
                                 NavigationBar(
@@ -83,11 +87,24 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        NavigationHost(navController)
-                    }
+                    NavigationHost(
+                        navController = navController,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    )
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
     }
 }
