@@ -1,13 +1,11 @@
 package com.example.lostfoundthings.screens
 
 import android.Manifest
-import android.graphics.BitmapFactory.decodeFile
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -21,13 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lostfoundthings.viewmodel.CreatePostViewModel
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -44,6 +38,8 @@ fun CreatePostScreen(navController: NavController) {
     val scrollState = rememberScrollState()
     var menu = remember { mutableStateOf(false) }
 
+    viewModel.checkAndLoadData()
+
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -54,6 +50,31 @@ fun CreatePostScreen(navController: NavController) {
             Toast.makeText(context, "Нужно разрешение камеры", Toast.LENGTH_SHORT).show()
         }
     }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                try {
+                    val inputStream = context.contentResolver.openInputStream(uri)
+
+                    val tempFile = java.io.File(context.cacheDir, "gallery_img_${System.currentTimeMillis()}.jpg")
+                    val outputStream = java.io.FileOutputStream(tempFile)
+
+                    inputStream?.copyTo(outputStream)
+
+                    inputStream?.close()
+                    outputStream.close()
+
+                    viewModel.capturedImagePath = tempFile.absolutePath
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(context, "Не удалось прочитать фото", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    )
 
     Scaffold { paddingValues ->
 
@@ -66,7 +87,10 @@ fun CreatePostScreen(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    viewModel.clearFields()
+                    navController.popBackStack()
+                          },
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
@@ -79,7 +103,7 @@ fun CreatePostScreen(navController: NavController) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = "Новое объявление",
+                text = if (viewModel.isEditMode) "Редактирование" else "Новое объявление",
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -161,10 +185,23 @@ fun CreatePostScreen(navController: NavController) {
                                 onDismissRequest = { menu.value = false }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Переделать фото") },
+                                    text = { Text("Сделать другое фото") },
                                     onClick = {
                                         menu.value = false
-                                        viewModel.cameraUsing = true
+                                        when(viewModel.permission) {
+                                            1 -> viewModel.cameraUsing = true
+                                            0 -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                        }
+                                    }
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text("Выбрать другое фото из галереи") },
+                                    onClick = {
+                                        photoPickerLauncher.launch(
+                                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                        )
+                                        menu.value = false
                                     }
                                 )
 
@@ -178,14 +215,24 @@ fun CreatePostScreen(navController: NavController) {
                             }
                         }
                     } else {
-                        Button(onClick = {
-                            when(viewModel.permission) {
-                                1 -> viewModel.cameraUsing = true
-                                0 -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        Column {
+                            Button(onClick = {
+                                when(viewModel.permission) {
+                                    1 -> viewModel.cameraUsing = true
+                                    0 -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
+                            }) {
+                                Text("Сделать фото")
                             }
-                        }) {
-                            Text("Сделать фото")
+                            Button(onClick = {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }) {
+                                Text("Выбрать фото из галереи")
+                            }
                         }
+
                     }
                 }
             }
@@ -219,9 +266,10 @@ fun CreatePostScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    viewModel.publishPost(
-                        onSuccess = {
-                            Toast.makeText(context, "Объявление успешно создано!", Toast.LENGTH_SHORT).show()
+                    viewModel.savePost(
+                        activity,
+                        onSuccess = { successMessage ->
+                            Toast.makeText(context, successMessage, Toast.LENGTH_SHORT).show()
                             navController.popBackStack()
                         },
                         onError = { error ->
@@ -232,7 +280,7 @@ fun CreatePostScreen(navController: NavController) {
                 enabled = !viewModel.isLoading,
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
-                if (viewModel.isLoading) CircularProgressIndicator() else Text("Опубликовать")
+                if (viewModel.isLoading) CircularProgressIndicator() else Text(if (viewModel.isEditMode) "Сохранить изменения" else "Опубликовать")
             }
 
             Spacer(modifier = Modifier.height(80.dp))

@@ -2,7 +2,9 @@ package com.example.lostfoundthings.data
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
@@ -135,6 +137,53 @@ object PostRepository {
             }
         } catch (e: Exception) {
             null
+        }
+    }
+
+    suspend fun getPostById(postId: String): Post? {
+        return try {
+            val document = FirebaseFirestore.getInstance()
+                .collection("items")
+                .document(postId)
+                .get()
+                .await()
+
+            if (document != null && document.exists()) {
+                document.toObject(Post::class.java)?.copy(id = document.id)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun deletePostById(postId: String): Boolean {
+        return try {
+            FirebaseFirestore.getInstance()
+                .collection("items")
+                .document(postId)
+                .delete()
+                .await()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun updatePost(postId: String, data: Map<String, Any?>): Boolean {
+        return try {
+            FirebaseFirestore.getInstance()
+                .collection("items")
+                .document(postId)
+                .update(data)
+                .await()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 

@@ -39,4 +39,15 @@ class MyPostsViewModel : ViewModel() {
             )
         }
     }
+
+    fun deletePost(postId: String) {
+        viewModelScope.launch {
+            val isSuccess = PostRepository.deletePostById(postId)
+
+            if (isSuccess) {
+                _myPosts.value = _myPosts.value.filter { it.id != postId }
+            }
+        }
+    }
+
 }

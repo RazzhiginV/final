@@ -2,6 +2,7 @@ package com.example.lostfoundthings.screens
 
 import androidx.compose.material3.Text
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,13 +16,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.lostfoundthings.navigation.ScreenClass
+import com.example.lostfoundthings.viewmodel.CreatePostViewModel
 import com.example.lostfoundthings.viewmodel.MyPostsViewModel
 
 @Composable
 fun MyPostsScreen(navController: NavController) {
     val viewModel: MyPostsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val context = LocalContext.current
+    val activity = LocalContext.current as ComponentActivity
+    val createPostViewModel: CreatePostViewModel = viewModel(activity)
 
     val myPosts by viewModel.myPosts.collectAsState()
 
@@ -33,7 +39,10 @@ fun MyPostsScreen(navController: NavController) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("create") },
+                onClick = {
+                    createPostViewModel.postId = null
+                    navController.navigate("create")
+                          },
                 modifier = Modifier.padding(bottom = 72.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Создать пост")
@@ -55,7 +64,25 @@ fun MyPostsScreen(navController: NavController) {
                         items = myPosts,
                         key = { post -> post.id }
                     ) { post ->
-                        PostCard(post.title, post.description, post.photo, post.address, post.lat, post.lon, post.authorName, post.authorPhoto, post.state)
+                        PostCard(
+                            post.title,
+                            post.description,
+                            post.photo,
+                            post.address,
+                            post.lat,
+                            post.lon,
+                            post.authorId,
+                            post.authorName,
+                            post.authorPhoto,
+                            post.state,
+                            post.timestamp,
+                            {
+                                createPostViewModel.postId = post.id
+                                navController.navigate(ScreenClass.Create.route)
+                            },
+                            {navController.navigate("detail/${post.id}")},
+                            { viewModel.deletePost(post.id) }
+                        )
                     }
                 }
             }

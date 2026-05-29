@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class PostsViewModel : ViewModel() {
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
-    val posts: StateFlow<List<Post>> = _posts.asStateFlow()
+    var posts: StateFlow<List<Post>> = _posts.asStateFlow()
     var isLoading by mutableStateOf(false)
     var errorText by mutableStateOf<String?>(null)
 
@@ -23,7 +23,7 @@ class PostsViewModel : ViewModel() {
         loadAllPosts()
     }
 
-    private fun loadAllPosts() {
+    fun loadAllPosts() {
         isLoading = true
         errorText = null
 
@@ -40,4 +40,15 @@ class PostsViewModel : ViewModel() {
             )
         }
     }
+
+    fun deletePost(postId: String) {
+        viewModelScope.launch {
+            val isSuccess = PostRepository.deletePostById(postId)
+
+            if (isSuccess) {
+                _posts.value = _posts.value.filter { it.id != postId }
+            }
+        }
+    }
+
 }
