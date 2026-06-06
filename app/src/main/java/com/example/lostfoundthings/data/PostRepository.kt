@@ -2,7 +2,9 @@ package com.example.lostfoundthings.data
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -39,20 +41,27 @@ object PostRepository {
 
     private val supabaseStorageApi = retrofit.create(SupabaseStorageApi::class.java)
 
-    fun getAllPosts(onSuccess: (List<Post>) -> Unit, onError: (String) -> Unit) {
-        db.collection("items")
-            .addSnapshotListener { snapshot, exception ->
-                if (exception != null) {
-                    return@addSnapshotListener onError(exception.message ?: "Ошибка")
-                }
+    suspend fun getAllPosts(lastDocument: DocumentSnapshot? = null): Pair<List<Post>, DocumentSnapshot?> {
+        return try {
+            var query = FirebaseFirestore.getInstance()
+                .collection("items")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(10)
 
-                val postsList = mutableListOf<Post>()
-                snapshot?.documents?.forEach { document ->
-                    val post = document.toObject(Post::class.java)
-                    if (post != null) postsList.add(post)
-                }
-                onSuccess(postsList.sortedByDescending { it.timestamp })
+            if (lastDocument != null) {
+                query = query.startAfter(lastDocument)
             }
+
+            val snapshot = query.get().await()
+            val postsList = snapshot.documents.mapNotNull { document ->
+                document.toObject(Post::class.java)?.copy(id = document.id)
+            }
+
+            Pair(postsList, snapshot.documents.lastOrNull())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Pair(emptyList(), null)
+        }
     }
 
     fun getMyPosts(onSuccess: (List<Post>) -> Unit, onError: (String) -> Unit) {

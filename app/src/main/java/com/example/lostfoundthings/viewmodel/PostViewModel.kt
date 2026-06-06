@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lostfoundthings.data.Post
 import com.example.lostfoundthings.data.PostRepository
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,28 +18,46 @@ class PostsViewModel : ViewModel() {
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     var posts: StateFlow<List<Post>> = _posts.asStateFlow()
     var isLoading by mutableStateOf(false)
+    var isRefreshing by mutableStateOf(false)
     var errorText by mutableStateOf<String?>(null)
+    var isEndReached by mutableStateOf(false)
+    private var lastDocument: DocumentSnapshot? = null
 
     init {
-        loadAllPosts()
+        loadNextPage()
     }
 
-    fun loadAllPosts() {
+    fun loadNextPage() {
+        if (isLoading || isEndReached) return
+
         isLoading = true
         errorText = null
 
         viewModelScope.launch {
-            PostRepository.getAllPosts(
-                onSuccess = { fetchedList ->
-                    isLoading = false
-                    _posts.value = fetchedList
-                },
-                onError = { message ->
-                    isLoading = false
-                    errorText = message
+            try {
+                val (newPosts, nextDocument) = PostRepository.getAllPosts(lastDocument)
+
+                if (newPosts.isEmpty()) {
+                    isEndReached = true
+                } else {
+                    val currentList = ArrayList(_posts.value)
+                    currentList.addAll(newPosts)
+                    _posts.value = currentList
+                    lastDocument = nextDocument
                 }
-            )
+            } catch (e: Exception) {
+                errorText = e.message
+            } finally {
+                isLoading = false
+            }
         }
+    }
+
+    fun refreshPosts() {
+        _posts.value = emptyList()
+        lastDocument = null
+        isEndReached = false
+        loadNextPage()
     }
 
     fun deletePost(postId: String) {

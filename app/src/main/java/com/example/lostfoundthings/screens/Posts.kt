@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,15 +31,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -48,9 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.lostfoundthings.R
-import com.example.lostfoundthings.navigation.ScreenClass
 import com.example.lostfoundthings.viewmodel.PostsViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -59,35 +61,73 @@ import com.google.firebase.auth.FirebaseAuth
 fun PostsScreen(navController: NavController, viewModel: PostsViewModel = viewModel()) {
     val posts by viewModel.posts.collectAsState()
 
+    val onEdit: (String) -> Unit = { id -> navController.navigate("create/$id") }
+    val onClick: (String) -> Unit = { id -> navController.navigate("detail/$id") }
+    val onDeleteClick: (String) -> Unit = { id -> viewModel.deletePost(id) }
+
+    val listState = rememberLazyListState()
+
+    val shouldLoadNextPage by remember {
+        derivedStateOf {
+            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItemsCount = listState.layoutInfo.totalItemsCount
+            lastVisibleItemIndex >= totalItemsCount - 2 && totalItemsCount > 0
+        }
+    }
+
+    LaunchedEffect(shouldLoadNextPage) {
+        if (shouldLoadNextPage && !viewModel.isEndReached && !viewModel.isLoading) {
+            viewModel.loadNextPage()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        if (viewModel.isLoading) {
+        if (viewModel.isLoading && posts.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
-            LazyColumn(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                contentPadding = PaddingValues(bottom = 120.dp)
+            PullToRefreshBox(
+                isRefreshing = viewModel.isRefreshing,
+                onRefresh = { viewModel.refreshPosts() },
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(
-                    items = posts,
-                    key = { post -> post.id }) { post ->
-                    PostCard(
-                        post.title,
-                        post.description,
-                        post.photo,
-                        post.address,
-                        post.lat,
-                        post.lon,
-                        post.authorName,
-                        post.authorId,
-                        post.authorPhoto,
-                        post.state,
-                        post.timestamp,
-                        { navController.navigate("create/${post.id}") },
-                        { navController.navigate("detail/${post.id}") },
-                        {
-                            viewModel.deletePost(post.id)
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    contentPadding = PaddingValues(bottom = 120.dp)
+                ) {
+                    itemsIndexed(
+                        items = posts,
+                        key = { _, post -> post.id }
+                    ) { index, post ->
+
+                        PostCard(
+                            post.title,
+                            post.description,
+                            post.photo,
+                            post.address,
+                            post.lat,
+                            post.lon,
+                            post.authorName,
+                            post.authorId,
+                            post.authorPhoto,
+                            post.state,
+                            post.timestamp,
+                            { onEdit(post.id) },
+                            { onClick(post.id) },
+                            { onDeleteClick(post.id) }
+                        )
+                    }
+
+                    if (viewModel.isLoading && posts.isNotEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                            }
                         }
-                    )
+                    }
                 }
             }
         }
@@ -173,9 +213,7 @@ fun PostCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     shape = RoundedCornerShape(32.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (state == "found") colorResource(R.color.found) else colorResource(
-                            R.color.lost
-                        )
+                        containerColor = if (state == "found") colorResource(R.color.found) else colorResource(R.color.lost)
                     ),
                     border = BorderStroke(1.dp, Color.LightGray)
                 ) {

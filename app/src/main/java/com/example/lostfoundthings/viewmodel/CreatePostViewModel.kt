@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lostfoundthings.data.PostRepository
 import kotlinx.coroutines.Dispatchers
@@ -110,10 +111,10 @@ class CreatePostViewModel() : ViewModel() {
                 val success = PostRepository.updatePost(postId!!, updateData)
                 if (success) {
                     try {
-                        val viewModelProvider = androidx.lifecycle.ViewModelProvider(activity)
+                        val viewModelProvider = ViewModelProvider(activity)
                         val postsViewModel = viewModelProvider[PostsViewModel::class.java]
 
-                        postsViewModel.loadAllPosts()
+                        postsViewModel.refreshPosts()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -153,6 +154,16 @@ class CreatePostViewModel() : ViewModel() {
                         photoUrl = serverPhotoUrl,
                         state = if (isLost) "lost" else "found",
                         onSuccess = {
+
+                            try {
+                                val viewModelProvider = ViewModelProvider(activity)
+                                val postsViewModel = viewModelProvider[PostsViewModel::class.java]
+
+                                postsViewModel.refreshPosts()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
                             clearFields()
                             isLoading = false
                             onSuccess("Объявление успешно создано")

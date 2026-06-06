@@ -36,7 +36,7 @@ fun CreatePostScreen(navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val scrollState = rememberScrollState()
-    var menu = remember { mutableStateOf(false) }
+    val menu = remember { mutableStateOf(false) }
 
     viewModel.checkAndLoadData()
 
