@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lostfoundthings.navigation.NavigationHost
 import com.example.lostfoundthings.navigation.ScreenClass
 import com.example.lostfoundthings.ui.theme.LostFoundThingsTheme
+import com.example.lostfoundthings.viewmodel.CreatePostViewModel
 import com.yandex.mapkit.MapKitFactory
 
 class MainActivity : ComponentActivity() {
@@ -37,11 +38,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             LostFoundThingsTheme {
                 val navController = rememberNavController()
-                val screens = listOf(ScreenClass.Posts, ScreenClass.MyPosts, ScreenClass.Chats, ScreenClass.Profile)
-                val hideBottomBar = listOf("register", "login", "detail")
+                val screens = listOf(ScreenClass.Posts, ScreenClass.MyPosts, ScreenClass.ChatsList, ScreenClass.Profile)
+                val hideBottomBar = listOf("register", "login", "detail", "chat/{itemId}/{receiverId}")
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-                val createPostViewModel: com.example.lostfoundthings.viewmodel.CreatePostViewModel = viewModel()
+                val createPostViewModel: CreatePostViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize().padding(vertical = 20.dp),

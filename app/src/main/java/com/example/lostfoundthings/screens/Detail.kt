@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +46,7 @@ fun PostDetailScreen(
 
     Scaffold { innerPadding ->
         val currentPost = viewModel.post
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
 
         Spacer(modifier = Modifier.statusBarsPadding())
 
@@ -185,6 +187,29 @@ fun PostDetailScreen(
                             }
                         }
                     )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                val isMyPost = currentPost.authorId == currentUser?.uid
+
+                if (currentPost.authorId != currentUser?.uid) {
+                    Button(
+                        onClick = {
+                            navController.navigate("chat/${currentPost.id}/${currentPost.authorId}")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = if (isMyPost) "Открыть обсуждение" else "Написать автору",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))

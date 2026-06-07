@@ -17,10 +17,11 @@ sealed class ScreenClass(
     data object Posts: ScreenClass("posts", "Posts", Icons.Default.Home, "Posts")
     data object Detail: ScreenClass("detail/{postId}", "Detail", Icons.Default.Details, "Details")
     data object MyPosts: ScreenClass("myPosts", "MyPosts", Icons.Default.Add, "MyPosts")
-    data object Chats: ScreenClass("chats", "Chats", Icons.AutoMirrored.Filled.Send, "Chats")
+    data object Chats: ScreenClass("chat/{itemId}/{receiverId}", "Chats", Icons.AutoMirrored.Filled.Send, "Chats")
     data object Profile: ScreenClass("profile", "Profile", Icons.Default.AccountCircle, "Profile")
     data object Register: ScreenClass("register", "Register", Icons.Default.AccountCircle, "Registration")
     data object Login: ScreenClass("login", "Login", Icons.Default.AccountCircle, "Login")
     data object Create: ScreenClass("create", "Create", Icons.Default.Add, "Create")
+    data object ChatsList: ScreenClass("chatsList", "ChatsList", Icons.AutoMirrored.Filled.Send, "ChatsList")
 
 }

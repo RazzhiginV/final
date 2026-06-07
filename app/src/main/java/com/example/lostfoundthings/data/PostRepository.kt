@@ -1,5 +1,7 @@
 package com.example.lostfoundthings.data
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -8,10 +10,13 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.ByteArrayOutputStream
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 data class Post(
     val id: String = "",
@@ -34,8 +39,14 @@ object PostRepository {
     private const val SUPABASE_URL = "https://eklodbposzlperjomuwp.supabase.co/"
     private const val ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrbG9kYnBvc3pscGVyam9tdXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg4MDAsImV4cCI6MjA5NTQzNDgwMH0.vAX3_d6KGLcumbG0TdU6QrDH6IItnDPqSHrXFcws_q8"
     private const val BUCKET_NAME = "images"
+    private val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .build()
     private val retrofit = Retrofit.Builder()
         .baseUrl(SUPABASE_URL)
+        .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -128,8 +139,9 @@ object PostRepository {
 
     suspend fun uploadImageToSupabase(imageBytes: ByteArray): String? {
         return try {
+            val compressedBytes = compressImageBytes(imageBytes)
             val fileName = "${UUID.randomUUID()}.jpg"
-            val requestBody = imageBytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
+            val requestBody = compressedBytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
 
             val response = supabaseStorageApi.uploadFile(
                 apiKey = "Bearer $ANON_KEY",
@@ -140,7 +152,8 @@ object PostRepository {
             )
 
             if (response.isSuccessful) {
-                "${SUPABASE_URL}storage/v1/object/public/$BUCKET_NAME/$fileName"
+                val url = "${SUPABASE_URL}/storage/v1/object/public/$BUCKET_NAME/$fileName"
+                url
             } else {
                 null
             }
@@ -193,6 +206,28 @@ object PostRepository {
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    fun compressImageBytes(imageBytes: ByteArray): ByteArray {
+        return try {
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size) ?: return imageBytes
+
+            val scaledBitmap = if (bitmap.width > 1280 || bitmap.height > 1280) {
+                val aspectRatio = bitmap.width.toDouble() / bitmap.height.toDouble()
+                val targetWidth = if (bitmap.width > bitmap.height) 1280 else (1280 * aspectRatio).toInt()
+                val targetHeight = if (bitmap.width > bitmap.height) (1280 / aspectRatio).toInt() else 1280
+                Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
+            } else {
+                bitmap
+            }
+
+            val outputStream = ByteArrayOutputStream()
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+            outputStream.toByteArray()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            imageBytes
         }
     }
 

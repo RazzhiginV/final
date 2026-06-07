@@ -8,7 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.lostfoundthings.data.AuthManager
-import com.example.lostfoundthings.screens.ChatsScreen
+import com.example.lostfoundthings.screens.ChatScreen
+import com.example.lostfoundthings.screens.ChatsListScreen
 import com.example.lostfoundthings.screens.CreatePostScreen
 import com.example.lostfoundthings.screens.MyPostsScreen
 import com.example.lostfoundthings.screens.LoginScreen
@@ -66,15 +67,24 @@ fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifi
         }
 
         composable(
-            route = ScreenClass.Chats.route
-        ) {
-            ChatsScreen()
-        }
-
-        composable(
             route = ScreenClass.Profile.route
         ) {
             ProfileScreen(navController)
+        }
+
+        composable(route = ScreenClass.ChatsList.route) {
+            ChatsListScreen(navController = navController)
+        }
+
+        composable(route = ScreenClass.Chats.route) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getString("itemId") ?: ""
+            val receiverId = backStackEntry.arguments?.getString("receiverId") ?: ""
+
+            ChatScreen(
+                navController = navController,
+                itemId = itemId,
+                receiverId = receiverId
+            )
         }
 
     }
