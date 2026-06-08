@@ -2,6 +2,9 @@ package com.example.lostfoundthings.data
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.example.lostfoundthings.data.Constants.ANON_KEY
+import com.example.lostfoundthings.data.Constants.BUCKET_NAME
+import com.example.lostfoundthings.data.Constants.SUPABASE_URL
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -36,9 +39,6 @@ data class Post(
 object PostRepository {
     private val db = Firebase.firestore
     private val auth = Firebase.auth
-    private const val SUPABASE_URL = "https://eklodbposzlperjomuwp.supabase.co/"
-    private const val ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrbG9kYnBvc3pscGVyam9tdXdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTg4MDAsImV4cCI6MjA5NTQzNDgwMH0.vAX3_d6KGLcumbG0TdU6QrDH6IItnDPqSHrXFcws_q8"
-    private const val BUCKET_NAME = "images"
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
@@ -122,7 +122,7 @@ object PostRepository {
             lat = lat,
             lon = lon,
             authorId = currentUser.uid,
-            authorName = currentUser.displayName ?: "Аноним",
+            authorName = currentUser.displayName ?: "Пользователь",
             authorPhoto = currentUser.photoUrl?.toString(),
             state = state,
             timestamp = System.currentTimeMillis()

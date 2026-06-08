@@ -22,10 +22,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lostfoundthings.R
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.lostfoundthings.data.PostRepository
@@ -84,7 +86,7 @@ fun ChatScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Обсуждение", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(stringResource(R.string.discussion), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(itemTitle, fontSize = 13.sp, color = Color.Gray, maxLines = 1)
                     }
                 },
@@ -92,7 +94,7 @@ fun ChatScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Назад"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 }
@@ -151,7 +153,7 @@ fun ChatScreen(
                             message.imageUrl?.let { url ->
                                 AsyncImage(
                                     model = url,
-                                    contentDescription = "Фото в чате",
+                                    contentDescription = stringResource(R.string.photo_in_chat),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(160.dp)
@@ -184,7 +186,7 @@ fun ChatScreen(
                 ) {
                     AsyncImage(
                         model = path,
-                        contentDescription = "Превью",
+                        contentDescription = stringResource(R.string.preview),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -196,7 +198,7 @@ fun ChatScreen(
                     ) {
                         Surface(shape = CircleShape, color = Color.Black.copy(alpha = 0.5f)) {
                             Text(
-                                "×",
+                                stringResource(R.string.x),
                                 color = Color.White,
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(horizontal = 4.dp)
@@ -218,7 +220,7 @@ fun ChatScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.AttachFile,
-                        contentDescription = "Отправить",
+                        contentDescription = stringResource(R.string.send),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -228,7 +230,7 @@ fun ChatScreen(
                 OutlinedTextField(
                     value = viewModel.messageText,
                     onValueChange = { viewModel.messageText = it },
-                    placeholder = { Text("Сообщение...") },
+                    placeholder = { Text(stringResource(R.string.message)) },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(24.dp),
                     maxLines = 3,
@@ -255,7 +257,7 @@ fun ChatScreen(
                     } else {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Отправить",
+                            contentDescription = stringResource(R.string.send),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }

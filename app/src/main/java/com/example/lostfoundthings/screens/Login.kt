@@ -4,14 +4,18 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -21,7 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -29,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.lostfoundthings.data.AuthManager
+import coil.compose.AsyncImage
+import com.example.lostfoundthings.R
+import com.example.lostfoundthings.data.Constants
 import com.example.lostfoundthings.viewmodel.LoginViewModel
 
 @Composable
@@ -43,32 +52,34 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Войти в аккаунт", fontSize = 32.sp, modifier = Modifier.padding(bottom = 32.dp))
+        Text(stringResource(R.string.log_in), fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 32.dp))
 
         OutlinedTextField(
             value = viewModel.email,
             onValueChange = { viewModel.email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
             singleLine = true
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = viewModel.password,
             onValueChange = { viewModel.password = it },
-            label = { Text("Пароль") },
+            label = { Text(stringResource(R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
+        OutlinedButton(
             onClick = {
                 viewModel.loginWithEmail(
                     onSuccess = {
@@ -79,12 +90,17 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                     }
                 )
             },
-            enabled = !viewModel.isLoading
+            enabled = !viewModel.isLoading,
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
+            )
         ) {
-            if (viewModel.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp)) else Text("Войти")
+            if (viewModel.isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp)) else Text(stringResource(R.string.enter))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
             onClick = {
@@ -101,15 +117,28 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                     }
                 )
             },
-            modifier = Modifier.fillMaxWidth().height(50.dp)
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
+            )
         ) {
-            Text("Войти через Google")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AsyncImage(
+                    model = Constants.GOOGLE_ICON,
+                    contentDescription = stringResource(R.string.ic_google)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(stringResource(R.string.log_in_with_google))
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Ещё нет аккаунта? Зарегистрироваться",
+            text = stringResource(R.string.sign_up_without_account),
             color = MaterialTheme.colorScheme.primary,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier.clickable {

@@ -3,16 +3,24 @@ package com.example.lostfoundthings.screens
 import android.content.Context
 import androidx.camera.core.ImageCapture
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import com.example.lostfoundthings.R
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,15 +32,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
+import coil.compose.rememberAsyncImagePainter
 import com.example.lostfoundthings.data.takePhoto
+import java.io.File
 
 @Composable
 fun CameraScreen(
     context: Context,
     lifecycleOwner: LifecycleOwner,
     cameraPermissionState: Int,
+    onBackClick: () -> Unit,
     reload: (String) -> Unit = {}
 ) {
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
@@ -50,7 +64,6 @@ fun CameraScreen(
 
             if (!isPhotoTaken) {
                 CameraPreview(
-                    context = context,
                     lifecycleOwner = lifecycleOwner,
                     onCameraReady = { provider, capture ->
                         cameraProvider = provider
@@ -59,19 +72,45 @@ fun CameraScreen(
                     }
                 )
             } else {
-                androidx.compose.foundation.Image(
-                    painter = coil.compose.rememberAsyncImagePainter(model = java.io.File(capturedPhotoPath)),
-                    contentDescription = "Превью сделанного фото",
+                Image(
+                    painter = rememberAsyncImagePainter(model = File(capturedPhotoPath)),
+                    contentDescription = stringResource(R.string.photo_preview),
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    contentScale = ContentScale.Crop
                 )
-
             }
+
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .padding(top = 24.dp, start = 16.dp)
+                    .align(Alignment.TopStart)
+                    .size(48.dp)
+                    .shadow(8.dp, CircleShape)
+                    .background(Color.White, CircleShape)
+                    .clip(CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back),
+                    tint = Color.Black,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
             if (!isPhotoTaken && isCameraReady) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(bottom = 70.dp)
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .background(Color(0x80000000))
+                ) {}
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 50.dp)
                         .shadow(elevation = 8.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(Color.White)
@@ -95,25 +134,33 @@ fun CameraScreen(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
+                    OutlinedButton(
                         onClick = { reload(capturedPhotoPath) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White.copy(alpha = 0.5f),
+                            contentColor = colorResource(R.color.grey)
+                        )
                     ) {
-                        Text("Ок")
+                        Text(stringResource(R.string.ok))
                     }
 
-                    Button(
+                    OutlinedButton(
                         onClick = {
                             isPhotoTaken = false
                             capturedPhotoPath = ""
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White.copy(alpha = 0.5f),
+                            contentColor = colorResource(R.color.grey)
+                        )
                     ) {
-                        Text("Сделать еще фото")
+                        Text(stringResource(R.string.make_a_photo))
                     }
                 }
             }

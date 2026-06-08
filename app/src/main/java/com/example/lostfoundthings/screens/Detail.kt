@@ -8,11 +8,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +54,7 @@ fun PostDetailScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
+                .height(56.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
@@ -62,7 +63,7 @@ fun PostDetailScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Назад",
+                    contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -70,9 +71,9 @@ fun PostDetailScreen(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = "Детали объявления",
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                text = stringResource(R.string.post_details),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -86,14 +87,14 @@ fun PostDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(16.dp)
+                    .padding(vertical = 24.dp, horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
 
                 if (!currentPost.photo.isNullOrEmpty()) {
                     AsyncImage(
                         model = currentPost.photo,
-                        contentDescription = "Фото вещи",
+                        contentDescription = stringResource(R.string.item_photo),
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
@@ -111,7 +112,7 @@ fun PostDetailScreen(
                 ) {
                     AsyncImage(
                         model = currentPost.authorPhoto,
-                        contentDescription = "Аватар автора",
+                        contentDescription = stringResource(R.string.author_photo),
                         fallback = painterResource(id = R.drawable.outline_account_circle_24),
                         modifier = Modifier
                             .size(44.dp)
@@ -131,14 +132,14 @@ fun PostDetailScreen(
                 }
 
                 Text(
-                    text = "Опубликовано: ${viewModel.formatTimestamp(currentPost.timestamp)}",
+                    text = stringResource(R.string.published) + viewModel.formatTimestamp(currentPost.timestamp),
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 Text(
-                    text = if (currentPost.state == "lost") "Потеряно" else "Найдено",
+                    text = if (currentPost.state == "lost") stringResource(R.string.lost) else stringResource(R.string.found),
                     color = Color.White,
                     modifier = Modifier
                         .background(if (currentPost.state == "lost") Color(0xFFEF5350) else Color(0xFF66BB6A),
@@ -151,12 +152,12 @@ fun PostDetailScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = currentPost.description, fontSize = 16.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Адрес: ${currentPost.address}", fontWeight = FontWeight.Medium)
+                Text(text = stringResource(R.string.address) + currentPost.address, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (currentPost.address.isNotEmpty()) {
 
-                    Text(text = "Место на карте:", modifier = Modifier.padding(bottom = 8.dp))
+                    Text(text = stringResource(R.string.place_on_map), modifier = Modifier.padding(bottom = 8.dp))
 
                     AndroidView(
                         modifier = Modifier
@@ -191,10 +192,8 @@ fun PostDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                val isMyPost = currentPost.authorId == currentUser?.uid
-
                 if (currentPost.authorId != currentUser?.uid) {
-                    Button(
+                    OutlinedButton(
                         onClick = {
                             navController.navigate("chat/${currentPost.id}/${currentPost.authorId}")
                         },
@@ -205,7 +204,7 @@ fun PostDetailScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = if (isMyPost) "Открыть обсуждение" else "Написать автору",
+                            text = stringResource(R.string.text_author),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -217,7 +216,7 @@ fun PostDetailScreen(
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Не удалось загрузить данные объявления")
+                Text(stringResource(R.string.could_not_load_the_post))
             }
         }
     }

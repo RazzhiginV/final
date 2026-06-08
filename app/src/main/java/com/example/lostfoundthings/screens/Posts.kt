@@ -30,6 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -37,7 +39,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -60,6 +65,14 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun PostsScreen(navController: NavController, viewModel: PostsViewModel = viewModel()) {
     val posts by viewModel.posts.collectAsState()
+    var selectedTab by remember { mutableStateOf(0) }
+    val filteredPosts = remember(posts, selectedTab) {
+        when (selectedTab) {
+            1 -> posts.filter { it.state == "lost" }
+            2 -> posts.filter { it.state == "found" }
+            else -> posts
+        }
+    }
 
     val onEdit: (String) -> Unit = { id -> navController.navigate("create/$id") }
     val onClick: (String) -> Unit = { id -> navController.navigate("detail/$id") }
@@ -85,6 +98,11 @@ fun PostsScreen(navController: NavController, viewModel: PostsViewModel = viewMo
         if (viewModel.isLoading && posts.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
+            PrimaryTabRow(selectedTabIndex = selectedTab, modifier = Modifier.fillMaxWidth()) {
+                Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("Все") })
+                Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("Потеряно") })
+                Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("Найдено") })
+            }
             PullToRefreshBox(
                 isRefreshing = viewModel.isRefreshing,
                 onRefresh = { viewModel.refreshPosts() },
@@ -92,11 +110,11 @@ fun PostsScreen(navController: NavController, viewModel: PostsViewModel = viewMo
             ) {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.padding(horizontal = 4.dp),
+                    modifier = Modifier.padding(top = 50.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
                     contentPadding = PaddingValues(bottom = 120.dp)
                 ) {
                     itemsIndexed(
-                        items = posts,
+                        items = filteredPosts,
                         key = { _, post -> post.id }
                     ) { index, post ->
 
@@ -224,9 +242,9 @@ fun PostCard(
                     ) {
                         Icon(
                             painter = painterResource(if (state == "found") R.drawable.outline_check_small_24 else R.drawable.outline_close_small_24),
-                            contentDescription = "Check icon"
+                            contentDescription = stringResource(R.string.check_icon)
                         )
-                        Text(if (state == "found") "Найдено" else "Потеряно")
+                        Text(if (state == "found") stringResource(R.string.found) else stringResource(R.string.lost))
                     }
                 }
 
@@ -245,7 +263,7 @@ fun PostCard(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.outline_arrow_forward_24),
-                            contentDescription = "Arrow",
+                            contentDescription = stringResource(R.string.arrow),
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -274,7 +292,7 @@ fun PostCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Изменить пост",
+                            contentDescription = stringResource(R.string.edit_post),
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -295,7 +313,7 @@ fun PostCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.DeleteOutline,
-                            contentDescription = "Удалить пост",
+                            contentDescription = stringResource(R.string.delete_post),
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )

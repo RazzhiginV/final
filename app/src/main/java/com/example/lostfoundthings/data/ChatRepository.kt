@@ -68,7 +68,7 @@ object ChatRepository {
                 if (snapshot != null) {
                     val previews = snapshot.documents.mapNotNull { doc ->
                         doc.toObject(ChatPreview::class.java)
-                    }.filter { it.senderId == currentUid || it.receiverId == currentUid } // 🎯 Чистая NoSQL фильтрация по полям!
+                    }.filter { it.senderId == currentUid || it.receiverId == currentUid }
 
                     trySend(previews)
                 }

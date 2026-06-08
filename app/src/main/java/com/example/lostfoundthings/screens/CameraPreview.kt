@@ -19,7 +19,6 @@ import androidx.lifecycle.LifecycleOwner
 
 @Composable
 fun CameraPreview(
-    context: Context,
     lifecycleOwner: LifecycleOwner,
     onCameraReady: (ProcessCameraProvider, ImageCapture) -> Unit
 ) {

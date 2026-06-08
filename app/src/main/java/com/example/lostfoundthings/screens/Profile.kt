@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
 import com.example.lostfoundthings.R
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,9 +30,9 @@ import com.google.firebase.auth.FirebaseAuth
 fun ProfileScreen(navController: NavController) {
     val currentUser = FirebaseAuth.getInstance().currentUser
 
-    val userName = currentUser?.displayName ?: "Пользователь"
-    val userEmail = currentUser?.email ?: "Почта не указана"
-    val userUid = currentUser?.uid ?: "ID не определен"
+    val userName = currentUser?.displayName ?: stringResource(R.string.user)
+    val userEmail = currentUser?.email ?: stringResource(R.string.no_email)
+    val userUid = currentUser?.uid ?: stringResource(R.string.no_id)
     val userPhotoUrl = currentUser?.photoUrl?.toString()
 
     Scaffold { innerPadding ->
@@ -46,7 +46,11 @@ fun ProfileScreen(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(16.dp))
-            Text("Личный кабинет", fontWeight = FontWeight.Bold)
+            Text(
+                text = stringResource(R.string.home),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -64,7 +68,7 @@ fun ProfileScreen(navController: NavController) {
 
             AsyncImage(
                 model = userPhotoUrl ?: R.drawable.outline_account_circle_24,
-                contentDescription = "Аватар профиля",
+                contentDescription = stringResource(R.string.profile_avatar),
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
@@ -85,7 +89,7 @@ fun ProfileScreen(navController: NavController) {
 
             SuggestionChip(
                 onClick = {},
-                label = { Text("Аккаунт зарегистрирован", color = MaterialTheme.colorScheme.primary) },
+                label = { Text(stringResource(R.string.account_registered), color = MaterialTheme.colorScheme.primary) },
                 modifier = Modifier.height(32.dp)
             )
 
@@ -109,11 +113,11 @@ fun ProfileScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = "Мои объявления", tint = MaterialTheme.colorScheme.primary)
+                    Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = stringResource(R.string.my_posts), tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text("Мои объявления", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Text("Управление созданными публикациями", fontSize = 12.sp, color = Color.Gray)
+                        Text(stringResource(R.string.my_posts), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.my_posts_control), fontSize = 12.sp, color = Color.Gray)
                     }
                 }
             }
@@ -126,13 +130,13 @@ fun ProfileScreen(navController: NavController) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
             ) {
                 Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                    Text("Системная информация", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.system_information), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text("Email: $userEmail", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.email_one) + userEmail, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(6.dp))
 
-                    Text("Системный UID: ${userUid.take(12)}...", fontSize = 13.sp, color = Color.Gray)
+                    Text(stringResource(R.string.system_uid) + "${userUid.take(12)}...", fontSize = 13.sp, color = Color.Gray)
                 }
             }
 
@@ -157,9 +161,9 @@ fun ProfileScreen(navController: NavController) {
                     .fillMaxWidth()
                     .height(56.dp)
             ) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Выйти")
+                Icon(imageVector = Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(R.string.leave))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Выйти из аккаунта", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.logout), fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

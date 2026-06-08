@@ -1,10 +1,11 @@
 package com.example.lostfoundthings.data
 
 import android.content.Context
-import android.util.Log
+import com.example.lostfoundthings.R
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.CustomCredential
+import com.example.lostfoundthings.data.Constants.WEB_CLIENT_ID
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
@@ -67,11 +68,11 @@ object AuthManager {
         onError: (String) -> Unit
     ) {
         val activityContext = context as? androidx.activity.ComponentActivity
-            ?: return onError("Неверный контекст экрана")
+            ?: return onError(context.getString(R.string.incorrect_context))
 
         val credentialManager = CredentialManager.create(activityContext)
 
-        val webClientId = "112702711436-cuopgbdvn98gt3qgtba0h45fi78957hm.apps.googleusercontent.com"
+        val webClientId = WEB_CLIENT_ID
 
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
@@ -103,7 +104,7 @@ object AuthManager {
                             if (newUser) {
                                 createUserProfile(
                                     uid = uid,
-                                    name = user?.displayName ?: "Пользователь Google",
+                                    name = user?.displayName ?: context.getString(R.string.google_user),
                                     email = user?.email ?: ""
                                 )
                             }

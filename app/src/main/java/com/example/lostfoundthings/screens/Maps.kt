@@ -7,11 +7,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.lostfoundthings.R
 import androidx.compose.ui.viewinterop.AndroidView
@@ -47,7 +46,7 @@ fun YandexMapsSection(viewModel: CreatePostViewModel) {
             .padding(vertical = 8.dp)
     ) {
         Text(
-            text = if (viewModel.address.isBlank()) "Адрес не указан (выберите на карте)" else "Место: ${viewModel.address}",
+            text = if (viewModel.address.isBlank()) stringResource(R.string.address_was_not_chose) else stringResource(R.string.place) + "${viewModel.address}",
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -60,7 +59,7 @@ fun YandexMapsSection(viewModel: CreatePostViewModel) {
                 .clickable { showMapDialog = true },
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Нажмите, чтобы выбрать место на карте", color = Color.DarkGray)
+            Text(text = stringResource(R.string.tap_to_choose_place), color = Color.DarkGray)
         }
     }
 
@@ -119,12 +118,12 @@ fun YandexMapsSection(viewModel: CreatePostViewModel) {
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Назад",
+                        contentDescription = stringResource(R.string.back),
                         tint = Color.Black
                     )
                 }
 
-                Button(
+                OutlinedButton(
                     onClick = {
                         showMapDialog = false
                         viewModel.updateAddressFromCoordinates(context)},
@@ -133,7 +132,7 @@ fun YandexMapsSection(viewModel: CreatePostViewModel) {
                         .padding(bottom = 32.dp)
                         .fillMaxWidth(0.8f)
                 ) {
-                    Text("Готово, сохранить место")
+                    Text(stringResource(R.string.save_place))
                 }
             }
         }
